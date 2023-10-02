@@ -1,6 +1,6 @@
 import './App.css';
 import React from "react";
-import landingpageicon1 from './img/LandingPage/landingpageicon1.png';
+
 
 import {
   BrowserRouter as Router,
@@ -9,9 +9,9 @@ import {
   Link
 } from "react-router-dom";
 
-import LandingPage from './components/views/LandingPage/LandingPage';
-import LoginPage from './components/views/LoginPage/LoginPage';
-import RegisterPage from './components/views/RegisterPage/RegisterPage';
+import LandingPage from './pages/LandingPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 
 function App() {
   return (
