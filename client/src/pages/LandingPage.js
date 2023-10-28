@@ -2,6 +2,7 @@ import React from "react";
 import img from "../img/LandingPageBackgroundLeft.png";
 import img2 from "../img/LandingPageBackgroundRight.png";
 import { Link } from "react-router-dom";
+
 function LandingPage() {
   return (
     <div className="LandingPage">

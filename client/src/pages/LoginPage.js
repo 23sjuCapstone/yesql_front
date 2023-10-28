@@ -1,9 +1,33 @@
-import React from "react";
-
+import React, { useEffect, useState } from "react";
 import { Button } from "../components/Button";
 import img from "../img/visualizationImage.png";
+import axios from "axios";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
-function LoginPage() {
+const LoginPage = () => {
+  const [userId, setUserId] = useState("");
+  const [userPassword, setUserPassword] = useState("");
+  const navigate = useNavigate();
+
+  function Login() {
+    const url = "http://yesql-api.shop:8080";
+    axios
+      .post(
+        url + "/auth/login",
+        {},
+        { params: { userId: userId, userPassword: userPassword } }
+      )
+      .then((response) => {
+        console.log("Response Data:", response);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+  const goToMain = () => {
+    localStorage.setItem("userId", userId);
+    navigate("/database");
+  };
   return (
     <div className="LoginPage relative h-screen">
       <p className="text-6xl text-yesql-blue pb-12">yeSQL</p>
@@ -23,6 +47,7 @@ function LoginPage() {
               name="id"
               placeholder="id"
               maxlength={10}
+              onChange={setUserId}
             />
           </div>
         </div>
@@ -41,10 +66,11 @@ function LoginPage() {
               name="id"
               placeholder="password"
               maxlength={10}
+              onChange={setUserPassword}
             />
           </div>
         </div>
-        <div className="mt-20">
+        <div className="mt-20" onClick={() => goToMain()}>
           <Button text="Login" />
         </div>
       </form>
@@ -55,7 +81,7 @@ function LoginPage() {
       </div>
     </div>
   );
-}
+};
 
 const Input = ({
   classStyle = "",
@@ -63,6 +89,7 @@ const Input = ({
   name = "",
   placeholder = "",
   maxlength = 0,
+  onChange = null
 }) => {
   return (
     <input
@@ -72,6 +99,9 @@ const Input = ({
       placeholder={placeholder}
       size="20"
       maxLength={maxlength}
+      onChange={(e) => {
+        onChange(e.target.value);
+      }}
     ></input>
   );
 };

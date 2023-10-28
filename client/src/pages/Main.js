@@ -4,7 +4,7 @@ import img from "../img/visualizationImage.png";
 import axios from "axios";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 
-const RegisterPage = () => {
+const Main = () => {
   const [userId, setUserId] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const [userPasswordCheck, setUserPasswordCheck] = useState("");
@@ -67,62 +67,27 @@ const RegisterPage = () => {
   }, [userPasswordCheck, isSame]);
 
   return (
-    <div className="RegisterPage relative h-screen">
-      <p className="text-6xl text-yesql-blue pb-12">yeSQL</p>
-      <form>
-        <div className="flex gap-4">
-          <div className="register-box flex flex-col border border-black w-80 rounded-xl">
-            <Input
-              classStyle="border-b border-black"
+    <div className="Main relative">
+      <div className="text-5xl mb-16 border-y border-indigo-500">
+        <p className="ml-5 mt-2.5 mb-2.5  text-yesql-blue font-bold">yeSQL</p>
+      </div>
+      <div class="ml-16 mr-16 grid grid-cols-2 gap-4">
+        <div>
+          <div className="register-box border mb-4 border-black w-auto h-96 rounded-xl">
+            {/* <Input
               type="text"
-              name="id"
-              placeholder="id"
-              maxlength={10}
+              size="auto"
+              maxlength={1000}
               onChange={setUserId}
-            />
-            <Input
-              classStyle="border-b border-black"
-              type="password"
-              name="password"
-              placeholder="password"
-              maxlength={20}
-              onChange={setUserPassword}
-            />
-            <Input
-              type="password"
-              name="password-check"
-              placeholder="password check"
-              maxlength={20}
-              onChange={setUserPasswordCheck}
-            />
+            /> */}
           </div>
-
-          <Button
-            type="idcheck"
-            textColor="black"
-            buttonColor="yesql-blue/50"
-            hoverColor="blue-700"
-            text="id check"
-          />
+          <div className="register-box border border-black w-auto h-96 rounded-xl">
+            {/* <Input type="text" maxlength={1000} onChange={setUserId} /> */}
+          </div>
         </div>
 
-        <div
-          className={`mt-${joininPaddingsize}`}
-          // disabled={isValid ? false : true}
-          onClick={() => goToLogin()}
-          // onClick={() => auth()}
-        >
-          {userPasswordCheck !== "" && !isSame() && (
-            <p className="passwordCheck text-sm text-red-600 font-thin">
-              비밀번호가 일치하지 않습니다.
-            </p>
-          )}
-          <Button type="joinin" text="join in" />
-        </div>
-      </form>
-      <div class="absolute bottom-0 right-0">
-        <div className="img opacity-50">
-          <img src={img} />
+        <div className="register-box border border-black w-auto rounded-xl">
+          {/* <Input type="text" maxlength={10} onChange={setUserId} /> */}
         </div>
       </div>
     </div>
@@ -135,7 +100,8 @@ const Input = ({
   name = "",
   placeholder = "",
   maxlength = 0,
-  onChange = null
+  onChange = null,
+  size = ""
 }) => {
   return (
     <input
@@ -143,7 +109,7 @@ const Input = ({
       type={type}
       name={name}
       placeholder={placeholder}
-      size="20"
+      size={size}
       maxLength={maxlength}
       onChange={(e) => {
         onChange(e.target.value);
@@ -152,4 +118,4 @@ const Input = ({
   );
 };
 
-export default RegisterPage;
+export default Main;
