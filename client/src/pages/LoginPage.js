@@ -8,26 +8,59 @@ const LoginPage = () => {
   const [userId, setUserId] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const navigate = useNavigate();
-
+  useEffect(() => {
+    console.log("userId=",userId,userPassword);
+  }, [userId, userPassword]);
+  
   function Login() {
     const url = "http://yesql-api.shop:8080";
     axios
       .post(
         url + "/auth/login",
         {},
-        { params: { userId: userId, userPassword: userPassword } }
+        {   userId: userId, userPassword: userPassword  }
       )
       .then((response) => {
-        console.log("Response Data:", response);
+        console.log("Response Data:", response.data);
+         if(response.isSuccess){
+          alert("로그인 되었습니다.");
+          localStorage.setItem("userId", userId);
+          FindDatabase();
+         }
+         else{
+          alert("로그인에 실패하였습니다. 아이디나 비밀번호를 확인해주세요.");
+         }
       })
       .catch((error) => {
         console.error("Error:", error);
       });
   }
-  const goToMain = () => {
-    localStorage.setItem("userId", userId);
+  function FindDatabase(){
+    const url = "http://yesql-api.shop:8080";
+    axios
+      .get(
+        url + "/auth/findDB",
+        {},
+        {   userId: userId  }
+      )
+      .then((response) => {
+         if(response.isSuccess){
+          goToMain();
+         }
+         else{
+          goToDatabase();
+         }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+  const goToDatabase = () => {
     navigate("/database");
   };
+  const goToMain =() =>{
+navigate("/visual");
+  }
   return (
     <div className="LoginPage relative h-screen">
       <p className="text-6xl text-yesql-blue pb-12">yeSQL</p>
@@ -70,8 +103,8 @@ const LoginPage = () => {
             />
           </div>
         </div>
-        <div className="mt-20" onClick={() => goToMain()}>
-          <Button text="Login" />
+        <div className="mt-20">
+          <Button onclick={Login} text="Login" />
         </div>
       </form>
       <div class="absolute bottom-0 right-0">
