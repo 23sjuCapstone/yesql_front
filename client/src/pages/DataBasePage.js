@@ -6,43 +6,30 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 
 const DataBasePage = () => {
   const [userDatabaseId, setUserDatabaseId] = useState("");
-  const [startPaddingsize, setstartinPaddingsize] = useState(28);
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
-  function auth() {
+  useEffect(() => {
+    console.log("userId=",userId,userDatabaseId);
+  }, [userDatabaseId]);
+  
+  function CreateDB() {
     const url = "http://yesql-api.shop:8080";
     axios
-      .post(url + "/auth/register", {}, { params: { userId: userId } })
+      .post(url + "/auth/createDB", {}, { params: { dbName: userDatabaseId, userId:userId } })
       .then((response) => {
-        console.log("Response Data:", response);
-        alert("Request Successful");
+        localStorage.setItem("dbCd",response.data.dbCd);
+        alert("데이터베이스 생성 완료!");
+        goToMain();
       })
       .catch((error) => {
         console.error("Error:", error);
         alert("Request Failed");
       })
-      .finally(() => {
-        alert("Request Completed");
-      });
   }
 
-  //join in 버튼 -> login 페이지 이동
   const goToMain = () => {
-    navigate("/main");
+    navigate("/visual");
   };
-
-  //에러메세지용 padding 관리
-  const handleDatabaseChange = () => {
-    if (userDatabaseId !== "") {
-      setstartinPaddingsize(8);
-    } else {
-      setstartinPaddingsize(9);
-    }
-  };
-  //useEffect로 실시간 출력
-  useEffect(() => {
-    handleDatabaseChange();
-  }, [userDatabaseId]);
 
   return (
     <div className="DataBasePage relative h-screen">
@@ -70,9 +57,9 @@ const DataBasePage = () => {
           )}
         </div>
 
-        <div className="ml-32" onClick={() => goToMain()}>
-          <div className={`mt-${startPaddingsize}`}>
-            <Button type="startbtn" text="start!" textSize="3xl" />
+        <div className="ml-32">
+          <div className="mt-2">
+            <Button onclick={CreateDB} type="startbtn" text="start!" textSize="3xl" />
           </div>
         </div>
       </form>
