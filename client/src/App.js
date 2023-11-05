@@ -8,6 +8,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import DataBasePage from "./pages/DataBasePage";
 import Main from "./pages/Main";
+import VisualizationPage from "./pages/VisualizationPage";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/database" element={<DataBasePage />} />
         <Route path="/main" element={<Main />} />
+        <Route path="/visual" element={<VisualizationPage/>}/>
       </Routes>
     </Router>
   );
