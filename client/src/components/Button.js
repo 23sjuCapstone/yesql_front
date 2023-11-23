@@ -1,14 +1,15 @@
 export const Button = ({
   type = "",
   textColor = "white",
-  buttonColor = "blue-600",
+  buttonColor = "yesql",
   hoverColor = "blue-700",
   textSize = "xl",
   text = "",
-  onclick=null
+  onclick=null,
+  buttontype="button"
 }) => {
   return (
-    <button type="button"
+    <button type={buttontype}
       class={`type=${type} h-fit text-${textColor} bg-${buttonColor} hover:bg-${hoverColor} text-${textSize} py-2 px-4 rounded-full`} 
       onClick ={onclick}
     >
