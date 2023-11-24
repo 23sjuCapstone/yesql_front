@@ -4,10 +4,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'yesql-blue': '#2169F4',
+        yesql: "#2169F4"
       }
-    },
+    }
   },
-  plugins: [],
-}
-
+  plugins: []
+};
