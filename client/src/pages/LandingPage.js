@@ -7,7 +7,7 @@ function LandingPage() {
   return (
     <div className="flex h-full flex-col">
       <h1 className="py-10">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl mt-10 px-4 sm:px-6 lg:px-8">
           <nav className="relative z-50 flex justify-between">
             <div className="flex items-center md:gap-x-12 font-black text-yesql text-xl">
               yeSQL
@@ -34,7 +34,7 @@ function LandingPage() {
           the query execution steps. Start your SQL journey today and master
           this powerful language with ease
         </p>
-        <div className="mt-16 flex justify-center gap-x-10 lg:mt-4">
+        <div className="mt-14 flex justify-center gap-x-10">
           <a
             href="/register"
             className="group flex inline-flex bg-yesql h-9 w-full items-center justify-center py-2 px-4 overflow-hidden rounded-full transition-all duration-300 text-white text-lg font-semibold hover:scale-110 active:duration-75 active:scale-95 sm:w-max focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2"
