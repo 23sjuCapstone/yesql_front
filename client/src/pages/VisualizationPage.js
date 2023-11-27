@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "../components/Button";
+import importIcon from "../img/import.png";
+import exportIcon from "../img/export.png";
 import axios from "axios";
+import { useAsyncError } from "react-router-dom";
 
 const VisualizationPage = () => {
   const [sqlInput, setSqlInput] = useState("");
@@ -108,7 +111,7 @@ const VisualizationPage = () => {
       <div className="text-5xl mb-10 border-b-2 border-yesql">
         <p className="ml-5 mt-2.5 mb-4 text-yesql font-bold">yeSQL</p>
       </div>
-      <div>2</div>
+
       <div class="grid grid-cols-2 gap-x-6 mx-8 mb-4">
         <div class="h-96 rounded-2xl shadow-md border border-grey">
           <textarea
@@ -148,6 +151,14 @@ const VisualizationPage = () => {
               {el.name}
             </li>
           ))}
+          <a className="col-start-11 text-center flex flex-row">
+            import
+            <img src={importIcon} className="w-5 h-5 mt-1 ml-1"></img>
+          </a>
+          <a className="text-center flex flex-row">
+            export
+            <img src={exportIcon} className="w-5 h-5 mt-1 ml-1"></img>
+          </a>
         </ul>
         {isRunClick ? (
           <div class="-mt-2.5 mb-20 w-full h-auto rounded-2xl shadow-md border border-grey bg-white z-10 relative">
@@ -161,6 +172,23 @@ const VisualizationPage = () => {
   );
 };
 
+const VisualSQLResult = ({ sqlparse }) => {
+  const url = "http://yesql-api.shop:8080";
+  const [tapResult, setTapResult] = useState({ columns: [], rows: [] });
+  axios
+    .get(url + "/sql/resultData", {
+      params: { sql: sqlparse, dbName: "admin" }
+    })
+    .then((response) => {
+      const result = response.data.result;
+      setTapResult(result);
+      console.log("2출력res=", result);
+      console.log("2저장res2=", tapResult);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+};
 const Result = ({ obj, isRunClick }) => {
   const convertRows = obj.rows.map((item) => Object.values(item));
   return isRunClick ? (
@@ -196,7 +224,6 @@ const Result = ({ obj, isRunClick }) => {
 const VisualSql = ({ obj, sql, isRunClick }) => {
   console.log("obj=", obj);
   const orderKeyword = ["SELECT", "FROM", "WHERE"];
-  const splitText = sql.split(" ");
   let count = 0;
   if (obj && Array.isArray(obj)) {
     return isRunClick ? (
@@ -250,10 +277,11 @@ const VisualSql = ({ obj, sql, isRunClick }) => {
                                           (col) => col.columnLabel === subject
                                         );
                                       return (
+                                        //"border-4 border-red-500"
                                         <th
-                                          className={`px-6 py-3 bg-sky-100 ${
+                                          className={`px-6 py-3 bg-sky-200 ${
                                             isConditionColumn
-                                              ? "border-4 border-red-500"
+                                              ? "bg-red-200"
                                               : ""
                                           }`}
                                         >
@@ -272,14 +300,17 @@ const VisualSql = ({ obj, sql, isRunClick }) => {
                                           (col) => col.columnLabel === subject
                                         );
                                       return (
+                                        //"border-4 border-red-500"
                                         <th
                                           key={columnIndex}
                                           className={`px-6 py-3 ${
                                             isConditionColumn
-                                              ? "border-4 border-red-500"
+                                              ? "bg-red-200"
                                               : ""
                                           } ${
-                                            isSelectedColumn ? "bg-sky-100" : ""
+                                            isSelectedColumn
+                                              ? "border-x-4 border-t-4 border-yesql"
+                                              : ""
                                           }`}
                                         >
                                           {subject}
@@ -303,7 +334,7 @@ const VisualSql = ({ obj, sql, isRunClick }) => {
                               {td.rows.map((row, rowIndex) => (
                                 <tr
                                   key={rowIndex}
-                                  className="border-b dark:bg-gray-800 dark:border-gray-700"
+                                  className="border-b dark:bg-gray-800 dark:border-gray-700 last:border-b-0"
                                 >
                                   {Object.entries(row).map(([key, value]) => {
                                     if (item.keyword === "SELECT") {
@@ -311,11 +342,22 @@ const VisualSql = ({ obj, sql, isRunClick }) => {
                                         item.selectedColumns.find(
                                           (col) => col.columnLabel === key
                                         );
+
+                                      const isLastColumn =
+                                        rowIndex === td.rows.length - 1;
+
+                                      console.log(row, rowIndex);
                                       return (
                                         <td
                                           key={key}
                                           className={`px-6 py-4 ${
-                                            isSelectedColumn ? "bg-sky-100" : ""
+                                            isSelectedColumn
+                                              ? "border-x-4 border-yesql"
+                                              : ""
+                                          } ${
+                                            isSelectedColumn && isLastColumn
+                                              ? "border-b-4 border-yesql"
+                                              : ""
                                           }`}
                                         >
                                           {value}
@@ -368,6 +410,7 @@ const VisualSql = ({ obj, sql, isRunClick }) => {
                   )}
                 </div>
               </div>
+              <div>1</div>
             </div>
           </div>
         ))}
