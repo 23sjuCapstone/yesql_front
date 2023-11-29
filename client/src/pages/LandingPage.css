@@ -4,16 +4,13 @@
   -webkit-background-clip: text;
   background-clip: text;
   text-shadow: 0px 3px 3px rgba(255, 255, 255, 0.3);
+  font-family: "GmarketSansMedium";
 }
 .button {
   -webkit-box-shadow: 0px 10px 13px -7px #000000,
     5px 5px 15px 5px rgba(0, 0, 0, 0);
   box-shadow: 0px 10px 13px -10px #434343, 5px 5px 15px 5px rgba(0, 0, 0, 0);
 }
-@font-face {
+.body {
   font-family: "GmarketSansMedium";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff")
-    format("woff");
-  font-weight: normal;
-  font-style: normal;
 }

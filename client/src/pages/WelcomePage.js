@@ -4,9 +4,15 @@ import jiwon from "../img/jiwon.png";
 import sungyeon from "../img/sungyeon.png";
 import minkyung from "../img/minkyung.png";
 import johyun from "../img/johyun.png";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import "./WelcomePage.css";
 
 function WelcomePage() {
+  const navigate = useNavigate();
+
+  const goToLanding = () => {
+    navigate("/");
+  };
   return (
     <body className="welcomeBody">
       <div className="flex h-full flex-col">
@@ -14,7 +20,12 @@ function WelcomePage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <nav className="relative z-50 flex justify-between">
               <div className="flex items-center md:gap-x-12 font-black text-yesql text-xl">
-                <img src={logo} width="121.35" height="15" />
+                <img
+                  src={logo}
+                  width="121.35"
+                  height="15"
+                  onClick={goToLanding()}
+                />
               </div>
             </nav>
           </div>
@@ -23,36 +34,36 @@ function WelcomePage() {
           <img
             style={{ visibility: "hidden" }}
             src={jiwon}
-            width="80"
-            height="80"
+            width="55"
+            height="55"
             class="mr-3 mt-5 mb-5"
           ></img>
           <img
             style={{ visibility: "hidden" }}
             src={sungyeon}
-            width="80"
-            height="80"
+            width="55"
+            height="55"
             class="mr-5 ml-5 mt-7 mb-7"
           ></img>
           <img
             style={{ visibility: "hidden" }}
             src={minkyung}
-            width="80"
-            height="80"
+            width="55"
+            height="55"
             class="mr-5 ml-5 mt-3 mb-3"
           ></img>
           <img
             style={{ visibility: "hidden" }}
             src={johyun}
-            width="80"
-            height="80"
+            width="55"
+            height="55"
             class="m-5"
           ></img>
         </div>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center mt-10">
-          <h1 className="mx-auto max-w-4xl font-display text-7xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
-            <div>
-              <span>Welcome,</span>
+          <h1 className="mx-auto max-w-4xl font-display text-7xl font-semibold tracking-tight text-slate-900 sm:text-6.5xl">
+            <div className="mb-4">
+              <span>Welcome !</span>
             </div>
             <span className="giveshadow">{localStorage.getItem("userId")}</span>
             님

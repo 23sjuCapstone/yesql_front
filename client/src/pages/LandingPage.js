@@ -17,7 +17,7 @@ function LandingPage() {
         </div>
       </h1>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center mt-10">
-        <h1 className="mx-auto max-w-4xl font-display text-5xl font-semibold tracking-tight text-slate-900 sm:text-7xl">
+        <h1 className="mx-auto max-w-4xl font-display text-5xl tracking-tight text-slate-900 sm:text-7xl">
           <span className="giveshadow">눈</span>으로 하는 편한
           <div className="relative whitesoace-nowrap m-2">
             <div className="relative">
