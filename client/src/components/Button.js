@@ -5,13 +5,14 @@ export const Button = ({
   hoverColor = "blue-700",
   textSize = "xl",
   text = "",
-  onclick=null,
-  buttontype="button"
+  onclick = null,
+  buttontype = "button",
 }) => {
   return (
-    <button type={buttontype}
-      class={`type=${type} h-fit text-${textColor} bg-${buttonColor} hover:bg-${hoverColor} text-${textSize} py-2 px-4 rounded-full`} 
-      onClick ={onclick}
+    <button
+      type={buttontype}
+      class={`type=${type} h-fit text-${textColor} bg-${buttonColor} hover:bg-${hoverColor} text-${textSize} py-2 px-4 rounded-full`}
+      onClick={onclick}
     >
       {text}
     </button>
