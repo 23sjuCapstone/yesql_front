@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useEffect } from "react";
+import logo from "../img/logo.png";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 
 function LandingPage() {
@@ -8,12 +9,15 @@ function LandingPage() {
   const [userPassword, setUserPassword] = useState("");
   const [userPasswordCheck, setUserPasswordCheck] = useState("");
   const [isDubplicated, setisDubplicated] = useState(true);
+  const [isCheck, setIsCheck] = useState(false);
+  const [idCheckMessage, setIdCheckMessage] = useState("");
   const isValid = userId !== "" && isSame === true;
   const navigate = useNavigate();
 
   useEffect(() => {
     console.log("userId=", userId, userPassword, userPasswordCheck);
     console.log("isdup= ", isDubplicated);
+    // setIsCheck(false);
   }, [userId, userPassword, userPasswordCheck, isDubplicated]);
 
   function idDuplicateCheck() {
@@ -23,19 +27,24 @@ function LandingPage() {
       .then((response) => {
         if (response.data) {
           if (userId === "") {
-            alert("아이디를 입력해주세요.");
+            // alert("아이디를 입력해주세요.");
+            setIsCheck(false);
+            setIdCheckMessage("아이디를 입력해주세요.");
           } else {
-            setisDubplicated(true);
-            alert("아이디를 사용할 수 있습니다.");
+            // alert("아이디를 사용할 수 있습니다.");
+            setIsCheck(true);
+            setIdCheckMessage("아이디를 사용할 수 있습니다.");
           }
         } else {
-          setisDubplicated(false);
-          alert("아이디를 사용할 수 없습니다.");
+          // alert("아이디를 사용할 수 없습니다.");
+          setIsCheck(false);
+          setIdCheckMessage("중복된 아이디입니다.");
         }
       })
       .catch((error) => {
         console.error("Error:", error);
-        alert("Request Failed");
+        // alert("Request Failed");
+        setIsCheck(true);
       });
   }
 
@@ -59,8 +68,7 @@ function LandingPage() {
         )
         .then((response) => {
           console.log("Response Data:", response);
-          alert("회원가입에 성공하셨습니다.");
-          goToLogin();
+          Login();
         })
         .catch((error) => {
           console.error("Error:", error);
@@ -78,6 +86,29 @@ function LandingPage() {
     }
   }
 
+  function Login() {
+    const url = "http://yesql-api.shop:8080";
+    localStorage.removeItem("userId");
+    axios
+      .post(
+        url + "/auth/login",
+        {},
+        { params: { userId: userId, userPassword: userPassword } }
+      )
+      .then((response) => {
+        console.log("Response Data:", response.data);
+        console.log(userId, userPassword);
+        if (response.data.isSuccess) {
+          localStorage.setItem("userId", userId);
+          goToWelcome();
+        } else {
+          alert("로그인에 실패하였습니다. 아이디나 비밀번호를 확인해주세요.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
   //join in 버튼 -> login 페이지 이동
   const goToLogin = () => {
     navigate("/login");
@@ -85,13 +116,18 @@ function LandingPage() {
   const goToLanding = () => {
     navigate("/");
   };
+  const goToWelcome = () => {
+    navigate("/welcome");
+  };
 
   return (
     <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div class="sm:mx-auto sm:w-full sm:max-w-sm">
         {/* <img class="mx-auto h-10 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company"> */}
         <li className="my-10 text-center text-6xl font-bold leading-9 tracking-tight text-yesql list-none">
-          <Link to="/">yeSQL</Link>
+          <div className="flex items-center justify-center font-black text-yesql text-xl">
+            <img src={logo} width="280" height="" onClick={goToLanding} />
+          </div>
         </li>
       </div>
 
@@ -128,6 +164,9 @@ function LandingPage() {
                 }}
               />
             </div>
+            <span style={isCheck ? { color: "green" } : { color: "red" }}>
+              {idCheckMessage}
+            </span>
           </div>
 
           <div>
