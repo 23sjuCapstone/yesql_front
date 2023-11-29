@@ -1,0 +1,12 @@
+.tutorialBody {
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: cover;
+  background-attachment: fixed;
+  height: 100vh;
+  background-repeat: no-repeat;
+}
+
+.torutialImg {
+  width: 100%;
+}

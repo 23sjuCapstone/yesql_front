@@ -7,6 +7,8 @@ import RegisterPage from "./pages/RegisterPage";
 import DataBasePage from "./pages/DataBasePage";
 import Main from "./pages/Main";
 import VisualizationPage from "./pages/VisualizationPage";
+import TutorialPage from "./pages/TutorialPage";
+import WelcomePage from "./pages/WelcomePage";
 
 function App() {
   return (
@@ -16,6 +18,8 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/visual" element={<VisualizationPage />} />
+        <Route path="/tutorial" element={<TutorialPage />} />
+        <Route path="/welcome" element={<WelcomePage />} />
       </Routes>
     </Router>
   );
