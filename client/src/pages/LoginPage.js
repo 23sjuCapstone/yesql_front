@@ -23,9 +23,11 @@ function LandingPage() {
     const url = "http://yesql-api.shop:8080";
     localStorage.removeItem("userId");
     axios
-      .post(url + "/auth/login", {
-        params: { userId: userId, userPassword: userPassword },
-      })
+      .post(
+        url + "/auth/login",
+        {},
+        { params: { userId: userId, userPassword: userPassword } }
+      )
       .then((response) => {
         console.log("Response Data:", response.data);
         console.log(userId, userPassword);
