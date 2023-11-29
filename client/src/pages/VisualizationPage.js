@@ -1,54 +1,86 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "../components/Button";
+import importIcon from "../img/import.png";
+import exportIcon from "../img/export.png";
 import axios from "axios";
+import _ from "lodash";
 
 const VisualizationPage = () => {
+  const [sqlInput, setSqlInput] = useState("");
   const [currentTab, clickTab] = useState(0);
-  const [VisualSQLdata, setVisualSQLData] = useState({ columns: [], rows: [] });
+
+  const [isRunClick, setIsRunClick] = useState(false);
+  const [VisualSQLdata, setVisualSQLData] = useState({
+    rows: [],
+    columns: [],
+    conditionColumns: [],
+    conditions: "",
+    keyword: "",
+    selectedColumns: [],
+    sqlStatement: "",
+    table: "",
+  });
+  const [Resultdata, setResultData] = useState({ columns: [], rows: [] });
   const [Schemasdata, setSchemasData] = useState({
     columns: [],
     rows: [],
     table: [],
   });
 
-  // const obj = {
-  //   header: ["품목", "가격(원)", "수량(개)"],
-  //   data: [
-  //     { fruit: "사과", price: "10000원", ea: "5" },
-  //     { fruit: "딸기", price: "8000원", ea: "25" },
-  //     { fruit: "복숭아", price: "15000원", ea: "6" },
-  //     { fruit: "바나나", price: "3000원", ea: "1" },
-  //     { fruit: "메론", price: "30000원", ea: "1" },
-  //     { fruit: "수박", price: "22000원", ea: "1" },
-  //     { fruit: "참외", price: "4000원", ea: "2" },
-  //     { fruit: "체리", price: "6000원", ea: "30" },
-  //     { fruit: "포도", price: "7000원", ea: "3" },
-  //     { fruit: "배", price: "4000원", ea: "1" },
-  //   ],
-  // };
-
+  //Tapmenu
   const menuArr = [
-    { name: "Visual SQL", content: <VisualSql obj={VisualSQLdata} /> },
-    { name: "Console", content: <visSQL /> },
-    { name: "Schemas", content: <TapSchemas schema={Schemasdata} /> },
-    { name: "Result", content: "Tab menu THREE" },
+    {
+      name: "Visual SQL",
+      content: <VisualSql obj={VisualSQLdata} isRunClick={isRunClick} />,
+    },
+    {
+      name: "Simple Schemas",
+      content: (
+        <TapSimpleSchemas schema={Schemasdata} isRunClick={isRunClick} />
+      ),
+    },
+    {
+      name: "Specific Schemas",
+      content: (
+        <TapSpecificSchemas schema={Schemasdata} isRunClick={isRunClick} />
+      ),
+    },
+    {
+      name: "Result",
+      content: <Result obj={Resultdata} isRunClick={isRunClick} />,
+    },
   ];
 
+  //Tapmenu-Handler
   const selectMenuHandler = (index) => {
     clickTab(index);
   };
 
+  //resultData, runByStep, simple/specific SchemasData api 호출
   function run() {
     const url = "http://yesql-api.shop:8080";
-    const sqlparse = "SELECT branch_name FROM account WHERE balance > 100;";
+    const sqlparse = sqlInput;
+    setIsRunClick(true);
+    axios
+      .get(url + "/sql/runByStep", {
+        params: { sql: sqlparse, dbName: "admin" },
+      })
+      .then((response) => {
+        const result = response.data.result;
+        console.log("visualsqlresult=", result);
+        setVisualSQLData(result);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+
     axios
       .get(url + "/sql/resultData", {
         params: { sql: sqlparse, dbName: "admin" },
       })
       .then((response) => {
         const result = response.data.result;
-        console.log("1 res=", result);
-        setVisualSQLData({ columns: result.columns, rows: result.rows });
+        setResultData(result);
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -56,11 +88,13 @@ const VisualizationPage = () => {
 
     axios
       .get(url + "/manage/schemas/specificData", {
-        params: { dbName: "u1" },
+        params: { dbName: "admin" },
       })
       .then((response) => {
         const result = response.data.result;
-        setSchemasData(result);
+        if (sqlparse !== "") {
+          setSchemasData(result);
+        }
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -69,198 +103,480 @@ const VisualizationPage = () => {
 
   return (
     <div>
-      <div className="text-5xl mb-16 border-y border-indigo-500">
-        <p className="ml-5 mt-2.5 mb-2.5 text-yesql-blue font-bold">yeSQL</p>
+      <div className="text-5xl mb-10 border-b-2 border-yesql">
+        <p className="ml-5 mt-2.5 mb-4 text-yesql font-bold">yeSQL</p>
       </div>
-      <div class="grid grid-cols-2 gap-x-6 mx-8 mb-4">
-        <div className="h-96 rounded-xl row-auto border border-black p-4 ">
-          <textarea type="text" class="h-5/6 w-full resize-none" />
-          {/* <button type="button" class="flex rounded-xl bg-blue-600 px-3 py-1.5 text-xl leading-6 text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">RUN</button> */}
 
+      <div class="grid grid-cols-2 gap-x-6 mx-8 mb-4">
+        <div class="h-96 rounded-2xl shadow-md border border-grey">
+          <textarea
+            type="text"
+            value={sqlInput}
+            onChange={(e) => {
+              setSqlInput(e.target.value);
+            }}
+            class="rounded-2xl h-5/6 w-full px-4 pt-4 resize-none focus:border-0"
+          />
           <button
             onClick={() => run()}
-            // type="button"
-            class="float-right rounded-xl bg-blue-600 px-3 py-1.5 text-xl text-white shadow-sm hover:bg-blue-700"
+            type="button"
+            class="float-right rounded-xl bg-blue-600 px-3 py-1.5 mr-3 shadow-sm text-xl text-white shadow-sm hover:bg-blue-700"
           >
             RUN
           </button>
+          {/* <button type="button" class="flex rounded-xl bg-blue-600 px-3 py-1.5 text-xl leading-6 text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">RUN</button> */}
         </div>
 
-        <div class="h-96 rounded-xl border border-black">
+        <div class="h-96 rounded-2xl shadow-md border">
           <div class="ml-4 relative overflow-x-auto shadow-md sm:rounded-lg"></div>
         </div>
       </div>
 
       <div class="mx-8 pt-2.5">
-        <ul className="grid grid-cols-12 justify-center ml-2">
+        <ul className="grid grid-cols-12 justify-center ml-4">
           {menuArr.map((el, index) => (
             <li
               className={`${
-                index === currentTab ? "submenu bg-yesql" : "bg-blue-200"
-              } pt-2.5 pb-4 text-lg text-white rounded-xl text-center md:col-span-2 sm:col-span-3 hover:bg-yesql hover:font-bold`}
+                index === currentTab
+                  ? "submenu bg-yesql font-bold"
+                  : "bg-blue-200"
+              } pt-2.5 pb-4 text-lg text-white shadow-lg rounded-xl text-center md:col-span-2 sm:col-span-3 hover:bg-yesql hover:font-bold`}
               onClick={() => selectMenuHandler(index)}
             >
               {el.name}
             </li>
           ))}
+          <a className="col-start-11 text-center flex flex-row">
+            import
+            <img src={importIcon} className="w-5 h-5 mt-1 ml-1"></img>
+          </a>
+          <a className="text-center flex flex-row">
+            export
+            <img src={exportIcon} className="w-5 h-5 mt-1 ml-1"></img>
+          </a>
         </ul>
-        <div class="-mt-2.5 mb-8 w-full h-screen rounded-xl border border-black bg-white z-10 relative">
-          {/* <div className="mx-auto my-8 w-3/5 rounded-xl border border-black"> */}
-          {menuArr[currentTab].content}
-        </div>
+        {isRunClick ? (
+          <div class="-mt-2.5 mb-20 w-full h-auto rounded-2xl shadow-md border border-grey bg-white z-10 relative">
+            <div className="h-full">{menuArr[currentTab].content}</div>
+          </div>
+        ) : (
+          <div className="-mt-2.5 mb-20 w-full h-screen rounded-2xl shadow-md border border-grey bg-white z-10 relative"></div>
+        )}
+      </div>
+      <div className="text-sm py-20 text-center font-gray-500 font-black">
+        appletantam
       </div>
     </div>
   );
 };
 
-const VisualSql = ({ obj }) => {
-  const convertRows = obj.rows.map((item) => Object.values(item));
-  console.log(convertRows);
-  return (
-    <div class="relative overflow-x-auto shadow-md sm:rounded-lg mx-auto my-8 w-fit">
-      <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-          <tr>
-            {obj.columns.map((subject) => {
-              return <th className="px-6 py-3">{subject}</th>;
-            })}
-          </tr>
-        </thead>
-        <tbody>
-          {convertRows.map((row) => (
-            <tr className="border-b dark:bg-gray-800 dark:border-gray-700">
-              {row.map((item) => (
-                <td className="px-6 py-4">{item}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
-const TapSchemas = ({ schema }) => {
-  return (
-    <div>
-      {schema.map((obj, index) => (
-        <div
-          key={index}
-          className="relative overflow-x-auto shadow-md sm:rounded-lg mx-auto my-8 w-fit"
-        >
-          <table className="text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+function RequestSQLResult({ sqlparse }) {
+  const url = "http://yesql-api.shop:8080";
+  const [tapResult, setTapResult] = useState({ columns: [], rows: [] });
+  useEffect(() => {
+    axios
+      .get(url + "/sql/resultData", {
+        params: {
+          sql: sqlparse,
+          dbName: "admin",
+        },
+      })
+      .then((response) => {
+        const result = response.data.result;
+        const deepCopiedResult = _.cloneDeep(result); // 깊은 복사
+        setTapResult(deepCopiedResult);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }, []);
+
+  if (tapResult) {
+    const convertRows = tapResult.rows.map((item) => Object.values(item));
+    return (
+      <div className="mx-10 my-20">
+        <div class="relative overflow-x-auto shadow-md sm:rounded-lg mx-auto my-8 w-fit">
+          <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
               <tr>
-                {obj.columns.map((subject, columnIndex) => (
-                  <th key={columnIndex} className="px-6 py-3">
-                    {subject}
-                  </th>
-                ))}
+                {tapResult.columns.map((subject) => {
+                  return <th className="px-6 py-3">{subject}</th>;
+                })}
               </tr>
             </thead>
             <tbody>
-              {obj.rows.map((row, rowIndex) => (
-                <tr
-                  key={rowIndex}
-                  className="border-b dark:bg-gray-800 dark:border-gray-700"
-                >
-                  {Object.values(row).map((item, itemIndex) => (
-                    <td key={itemIndex} className="px-6 py-4">
-                      {item}
-                    </td>
+              {convertRows.map((row) => (
+                <tr className="border-b dark:bg-gray-800 dark:border-gray-700">
+                  {row.map((item) => (
+                    <td className="px-6 py-4">{item}</td>
                   ))}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      ))}
-    </div>
-  );
+      </div>
+    );
+  }
+}
+
+const Result = ({ obj, isRunClick }) => {
+  if (obj.columns && Array.isArray(obj.columns)) {
+    const convertRows = obj.rows.map((item) => Object.values(item));
+    return isRunClick ? (
+      <div>
+        <div className="flex flex-row">
+          <div class="relative overflow-x-auto shadow-md sm:rounded-lg mx-auto my-8 w-fit">
+            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+              <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                  {obj.columns.map((subject) => {
+                    return <th className="px-6 py-3">{subject}</th>;
+                  })}
+                </tr>
+              </thead>
+              <tbody>
+                {convertRows.map((row) => (
+                  <tr className="border-b dark:bg-gray-800 dark:border-gray-700">
+                    {row.map((item) => (
+                      <td className="px-6 py-4">{item}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    ) : (
+      <div></div>
+    );
+  } else {
+    return <div></div>;
+  }
 };
-const visSQL = () => {
-  return (
-    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-      <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-          <tr>
-            <th scope="col" class="px-6 py-3">
-              Product name
-            </th>
-            <th scope="col" class="px-6 py-3">
-              Color
-            </th>
-            <th scope="col" class="px-6 py-3">
-              Category
-            </th>
-            <th scope="col" class="px-6 py-3">
-              Price
-            </th>
-            <th scope="col" class="px-6 py-3">
-              Action
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              Apple MacBook Pro 17"
-            </th>
-            <td class="px-6 py-4">Silver</td>
-            <td class="px-6 py-4">Laptop</td>
-            <td class="px-6 py-4">$2999</td>
-            <td class="px-6 py-4">
-              <a
-                href="#"
-                class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-              >
-                Edit
-              </a>
-            </td>
-          </tr>
-          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              Microsoft Surface Pro
-            </th>
-            <td class="px-6 py-4">White</td>
-            <td class="px-6 py-4">Laptop PC</td>
-            <td class="px-6 py-4">$1999</td>
-            <td class="px-6 py-4">
-              <a
-                href="#"
-                class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-              >
-                Edit
-              </a>
-            </td>
-          </tr>
-          <tr class="bg-white dark:bg-gray-800">
-            <th
-              scope="row"
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              Magic Mouse 2
-            </th>
-            <td class="px-6 py-4">Black</td>
-            <td class="px-6 py-4">Accessories</td>
-            <td class="px-6 py-4">$99</td>
-            <td class="px-6 py-4">
-              <a
-                href="#"
-                class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-              >
-                Edit
-              </a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  );
+
+//tap-VisualSql
+const VisualSql = ({ obj, isRunClick }) => {
+  const orderKeyword = ["SELECT", "FROM", "WHERE"];
+  let count = 0;
+  if (obj && Array.isArray(obj)) {
+    return isRunClick ? (
+      <div>
+        {obj.map((item) => (
+          <div className="border-b-2">
+            <div className="flex flex-row w-full h-24 border-b-2 border-grey-400">
+              <div className="w-1/12 border-r-2 border-grey">
+                <div className=" my-4 text-center text-3xl font-extrabold text-yesql">
+                  {++count}
+                </div>
+              </div>
+              <div className="w-full pt-4 pl-2">
+                <p>
+                  {item.sqlStatement.split(" ").map((word, index) => {
+                    const isKeyword = orderKeyword.includes(
+                      word.replace(/>/, "")
+                    );
+                    return (
+                      <span
+                        key={index}
+                        className={isKeyword ? "text-yesql font-bold" : ""}
+                      >
+                        {word}{" "}
+                      </span>
+                    );
+                  })}
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-row">
+              <div className="w-3/5 border-r border-gray-700">
+                <div className="px-8 pt-8 flex flex-wrap gap-x-8 gap-y-4">
+                  {item.tableData ? (
+                    item.tableData.map((td) => (
+                      <div className="mt-6">
+                        {td.tables !== null && (
+                          <p className="mb-4 text-center font-bold text-xl">
+                            {td.table}
+                          </p>
+                        )}
+                        <div className="relative overflow-x-auto shadow-md sm:rounded-lg mx-auto mb-8 w-fit">
+                          <table className="text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 border-b border-slate-500">
+                              <tr>
+                                {td.columns.map((subject, columnIndex) => {
+                                  if (item.keyword === "SELECT") {
+                                    var isSelectedColumn;
+                                    const columnLabel =
+                                      item.selectedColumns[0].columnLabel;
+                                    if (columnLabel === "*") {
+                                      isSelectedColumn = true;
+                                    } else {
+                                      if (
+                                        item.selectedColumns.tableName === null
+                                      ) {
+                                        isSelectedColumn =
+                                          item.selectedColumns.find(
+                                            (col) => col.columnLabel === subject
+                                          );
+                                        console.log(
+                                          "Xxxxxxxxxxxxxxxxxxx",
+                                          isSelectedColumn
+                                        );
+                                      } else {
+                                        isSelectedColumn =
+                                          item.selectedColumns.find((col) => {
+                                            col.columnLabel === subject &&
+                                              item.selectedColumns.tableName ===
+                                                item.tables.alias;
+                                          });
+                                        // console.log(columnIndex);
+                                        // console.log(isSelectedColumn);
+                                        // isSelectedColumn =
+                                        //   item.selectedColumns.find(
+                                        //     (col) => col.columnLabel === subject
+                                        //   ) &&
+                                        //   item.selectedColumns.tableName ===
+                                        //     item.tables.alias;
+
+                                        console.log(
+                                          isSelectedColumn,
+                                          "00000000000000000000000000"
+                                        );
+                                        console.log(
+                                          item.selectedColumns.tableName ===
+                                            item.tables.alias
+                                        );
+                                      }
+                                    }
+                                    if (item.conditionColumns === null) {
+                                      return (
+                                        <th
+                                          className={`px-6 py-3 border-x-4 border-t-4 border-yesql ${
+                                            isSelectedColumn
+                                              ? "border-x-4 border-t-4 border-yesql"
+                                              : ""
+                                          }`}
+                                        >
+                                          {subject}
+                                        </th>
+                                      );
+                                    } else {
+                                      const isConditionColumn =
+                                        item.conditionColumns.find(
+                                          (col) => col.columnLabel === subject
+                                        );
+
+                                      return (
+                                        <th
+                                          className={`px-6 py-3 border-x-4 border-t-4 border-yesql ${
+                                            isConditionColumn
+                                              ? "bg-red-200"
+                                              : ""
+                                          } ${
+                                            isSelectedColumn
+                                              ? "border-x-4 border-t-4 border-yesql"
+                                              : ""
+                                          }`}
+                                        >
+                                          {subject}
+                                        </th>
+                                      );
+                                    }
+                                  } else {
+                                    return (
+                                      <th
+                                        key={columnIndex}
+                                        className="px-6 py-3"
+                                      >
+                                        {subject}
+                                      </th>
+                                    );
+                                  }
+                                })}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {td.rows.map((row, rowIndex) => (
+                                <tr
+                                  key={rowIndex}
+                                  className="border-b dark:bg-gray-800 dark:border-gray-700 last:border-b-0"
+                                >
+                                  {Object.entries(row).map(([key, value]) => {
+                                    if (item.keyword === "SELECT") {
+                                      const columnLabel =
+                                        item.selectedColumns[0].columnLabel;
+                                      var isSelectedColumn;
+                                      const isLastColumn =
+                                        rowIndex === td.rows.length - 1;
+                                      if (columnLabel === "*") {
+                                        isSelectedColumn = true;
+                                      } else {
+                                        isSelectedColumn =
+                                          item.selectedColumns.find(
+                                            (col) => col.columnLabel === key
+                                          );
+                                      }
+
+                                      return (
+                                        <td
+                                          key={key}
+                                          className={`px-6 py-4 ${
+                                            isSelectedColumn
+                                              ? "border-x-4 border-yesql"
+                                              : ""
+                                          } ${
+                                            isSelectedColumn && isLastColumn
+                                              ? "border-b-4 border-yesql"
+                                              : ""
+                                          }`}
+                                        >
+                                          {value}
+                                        </td>
+                                      );
+                                    } else {
+                                      return (
+                                        <td key={key} className="px-6 py-4">
+                                          {value}
+                                        </td>
+                                      );
+                                    }
+                                  })}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div></div>
+                  )}
+                </div>
+                <div>
+                  {item.conditions && item.conditions[0] ? (
+                    <div className="mx-auto mb-8 w-11/12 h-20 rounded-3xl bg-red-100">
+                      <div>
+                        <p className="px-8 py-4">
+                          {item.conditions[0].split(" ").map((word, index) => {
+                            const isKeyword = orderKeyword.includes(
+                              word.replace(/>/, "")
+                            );
+                            return (
+                              <span
+                                key={index}
+                                className={
+                                  isKeyword ? "text-red-500 font-bold" : ""
+                                }
+                              >
+                                {word}{" "}
+                              </span>
+                            );
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div></div>
+                  )}
+                </div>
+              </div>
+              <div>
+                <RequestSQLResult sqlparse={item.sqlStatement} />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div></div>
+    );
+  } else {
+    return <div></div>;
+  }
 };
+
+const TapSimpleSchemas = ({ schema, isRunClick }) => {
+  if (schema) {
+    return isRunClick ? (
+      <div className="px-8 pt-8 flex flex-wrap gap-x-8 gap-y-4">
+        {schema.map((obj, index) => (
+          <div className="mt-6">
+            <p className="mb-2 text-center font-bold text-xl">{obj.table}</p>
+            <div
+              key={index}
+              className="relative overflow-x-auto shadow-md sm:rounded-lg mx-auto mb-8 w-fit"
+            >
+              <table className="text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <tbody>
+                  {obj.columns.map((col) => (
+                    <tr className="border-b dark:bg-gray-800">
+                      <td className="px-6 py-4 text-xs text-gray-700 font-semibold uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        {col}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div></div>
+    );
+  } else {
+    return <div></div>;
+  }
+};
+
+//Tap-Specific_Schemas
+const TapSpecificSchemas = ({ schema, isRunClick }) => {
+  if (schema) {
+    return isRunClick ? (
+      <div className="px-8 pt-8 flex flex-wrap gap-x-8 gap-y-4">
+        {schema.map((obj, index) => (
+          <div className="mt-6">
+            <p className="mb-2 text-center font-bold text-xl">{obj.table}</p>
+            <div
+              key={index}
+              className="relative overflow-x-auto shadow-md sm:rounded-lg mx-auto mb-8 w-fit"
+            >
+              <table className="text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                  <tr>
+                    {obj.columns.map((subject, columnIndex) => (
+                      <th key={columnIndex} className="px-6 py-3">
+                        {subject}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {obj.rows.map((row, rowIndex) => (
+                    <tr
+                      key={rowIndex}
+                      className="border-b dark:bg-gray-800 dark:border-gray-700"
+                    >
+                      {Object.values(row).map((item, itemIndex) => (
+                        <td key={itemIndex} className="px-6 py-4">
+                          {item}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div></div>
+    );
+  } else {
+    return <div></div>;
+  }
+};
+
 export default VisualizationPage;
