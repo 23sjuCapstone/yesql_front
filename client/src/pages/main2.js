@@ -10,7 +10,7 @@ const Main2 = () => {
     const url = "http://yesql-api.shop:8080";
     axios
       .get(url + "/manage/schemas/specificData", {
-        params: { dbName: "appletantam" },
+        params: { dbName: localStorage.getItem("userId") },
       })
       .then((response) => {
         const result = response.data.result;

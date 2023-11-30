@@ -71,7 +71,7 @@ const VisualizationPage = () => {
     setIsRunClick(true);
     axios
       .get(url + "/sql/runByStep", {
-        params: { sql: sqlparse, dbName: "appletantam" },
+        params: { sql: sqlparse, dbName: userId },
       })
       .then((response) => {
         const result = response.data.result;
@@ -93,7 +93,7 @@ const VisualizationPage = () => {
 
     axios
       .get(url + "/sql/resultData", {
-        params: { sql: sqlparse, dbName: "appletantam" },
+        params: { sql: sqlparse, dbName: userId },
       })
       .then((response) => {
         const result = response.data.result;
@@ -106,7 +106,7 @@ const VisualizationPage = () => {
 
     axios
       .get(url + "/manage/schemas/specificData", {
-        params: { dbName: "appletantam" },
+        params: { dbName: userId },
       })
       .then((response) => {
         const result = response.data.result;
@@ -210,7 +210,7 @@ const VisualizationPage = () => {
   );
 };
 
-function RequestSQLResult({ sqlparse }) {
+function RequestSQLResult({ sqlparse, userId }) {
   const url = "http://yesql-api.shop:8080";
   const [tapResult, setTapResult] = useState({ columns: [], rows: [] });
   useEffect(() => {
@@ -218,7 +218,7 @@ function RequestSQLResult({ sqlparse }) {
       .get(url + "/sql/resultData", {
         params: {
           sql: sqlparse,
-          dbName: "admin",
+          dbName: userId,
         },
       })
       .then((response) => {
@@ -505,7 +505,9 @@ const VisualSql = ({ obj, isRunClick }) => {
                 </div>
               </div>
               <div>
-                <RequestSQLResult sqlparse={item.sqlStatement} />
+                <RequestSQLResult
+                  sqlparse={(item.sqlStatement, localStorage.getItem("userId"))}
+                />
               </div>
             </div>
           </div>
