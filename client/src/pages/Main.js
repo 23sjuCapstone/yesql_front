@@ -1,120 +1,133 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "../components/Button";
-import img from "../img/visualizationImage.png";
 import axios from "axios";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useAsyncError, useNavigate } from "react-router-dom";
 
 const Main = () => {
-  const [userId, setUserId] = useState("");
-  const [userPassword, setUserPassword] = useState("");
-  const [userPasswordCheck, setUserPasswordCheck] = useState("");
-  const [joininPaddingsize, setjoininPaddingsize] = useState(28);
-  const isValid = userId !== "" && isSame === true;
-  const navigate = useNavigate();
-
-  //출력 확인용
-  // useEffect(() => {
-  //   console.log(userId, userPassword, userPasswordCheck);
-  // }, [userId, userPassword, userPasswordCheck]);
-
-  function auth() {
+  const [Schemasdata, setSchemasData] = useState({
+    table: [],
+  });
+  useEffect(() => {
     const url = "http://yesql-api.shop:8080";
     axios
-      .post(
-        url + "/auth/register",
-        {},
-        { params: { userId: userId, userPassword: userPassword } }
-      )
+      .get(url + "/manage/schemas/specificData", {
+        params: { dbName: "admin" },
+      })
       .then((response) => {
-        console.log("Response Data:", response);
-        alert("Request Successful");
+        const result = response.data.result;
+        console.log(result);
+        setSchemasData(result);
       })
       .catch((error) => {
         console.error("Error:", error);
-        alert("Request Failed");
-      })
-      .finally(() => {
-        alert("Request Completed");
       });
-  }
+  }, [Schemasdata]);
 
-  //비밀번호, 비밀번호 확인 같은지 확인하는 함수
-  function isSame() {
-    if (userPassword === userPasswordCheck) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  //join in 버튼 -> login 페이지 이동
-  const goToLogin = () => {
-    navigate("/login");
+  const [data, setData] = useState([]);
+  const exportdb = ({ tableName }) => {
+    console.log(tableName);
+    const url = "http://yesql-api.shop:8080";
+    axios
+      .get(url + "/manage/export", {
+        params: { dbName: "u1", tableName: tableName },
+      })
+      .then((response) => {
+        console.log("Response Data:", response);
+        setData(response.data.JSON);
+        console.log(data);
+        onDownloadBtn({ table: tableName }); // 데이터 다운로드 함수 호출
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   };
-
-  //에러메세지용 padding 관리
-  const handlePasswordChange = () => {
-    if (userPasswordCheck !== "" && !isSame()) {
-      setjoininPaddingsize(24);
-    } else {
-      setjoininPaddingsize(28);
-    }
+  const onDownloadBtn = ({ table }) => {
+    const name = table; // 파일명
+    downloadFile({
+      data: JSON.stringify(data),
+      fileName: `${name}.json`,
+      fileType: "text/json",
+    });
   };
-
-  //useEffect로 실시간 출력
-  useEffect(() => {
-    handlePasswordChange();
-  }, [userPasswordCheck, isSame]);
-
-  return (
-    <div className="Main relative">
-      <div className="text-5xl mb-16 border-y border-indigo-500">
-        <p className="ml-5 mt-2.5 mb-2.5  text-yesql-blue font-bold">yeSQL</p>
-      </div>
-      <div class="ml-16 mr-16 grid grid-cols-2 gap-4">
-        <div>
-          <div className="register-box border mb-4 border-black w-auto h-96 rounded-xl">
-            {/* <Input
-              type="text"
-              size="auto"
-              maxlength={1000}
-              onChange={setUserId}
-            /> */}
-          </div>
-          <div className="register-box border border-black w-auto h-96 rounded-xl">
-            {/* <Input type="text" maxlength={1000} onChange={setUserId} /> */}
-          </div>
+  const downloadFile = ({ data, fileName, fileType }) => {
+    const blob = new Blob([data], { type: fileType });
+    const link = document.createElement("a");
+    link.download = fileName;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+  };
+  const TableList = ({ obj }) => {
+    if (obj && Array.isArray(obj)) {
+      return (
+        <div className="px-8 flex flex-wrap gap-x-8 gap-y-4">
+          {obj.map((tb) => (
+            <div className="mt-6">
+              <a
+                className="mb-2 text-center font-bold text-xl list-none"
+                onClick={() => exportdb({ tableName: tb.table })}
+              >
+                {tb.table}
+              </a>
+            </div>
+          ))}
         </div>
-
-        <div className="register-box border border-black w-auto rounded-xl">
-          {/* <Input type="text" maxlength={10} onChange={setUserId} /> */}
+      );
+    } else {
+      return <div></div>;
+    }
+  };
+  return (
+    <div>
+      <div className="absolute rounded-lg shadow bg-black h-screen w-screen">
+        <div class="relative bg-white flex min-h-full flex-col justify-center px-96 py-12 shadow-lg">
+          <div class="flex items-center justify-between p-4 border-b dark:border-gray-600">
+            <h3 class="text-3xl font-bold text-gray-900 dark:text-white">
+              테이블 목록
+            </h3>
+            <a
+              href="/visual"
+              class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+              data-modal-hide="default-modal"
+            >
+              <svg
+                class="w-3 h-3"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 14 14"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                />
+              </svg>
+              <span class="sr-only">Close modal</span>
+            </a>
+          </div>
+          <div class="p-4 md:p-5 space-y-4">
+            <TableList obj={Schemasdata} />
+          </div>
+          <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+            <button
+              data-modal-hide="default-modal"
+              type="button"
+              class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              I accept
+            </button>
+            <button
+              data-modal-hide="default-modal"
+              type="button"
+              class="ms-3 text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+            >
+              Decline
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  );
-};
-
-const Input = ({
-  classStyle = "",
-  type = "",
-  name = "",
-  placeholder = "",
-  maxlength = 0,
-  onChange = null,
-  size = ""
-}) => {
-  return (
-    <input
-      className={`py-2.5 pl-6 bg-transparent ${classStyle}`}
-      type={type}
-      name={name}
-      placeholder={placeholder}
-      size={size}
-      maxLength={maxlength}
-      onChange={(e) => {
-        onChange(e.target.value);
-      }}
-    ></input>
   );
 };
 

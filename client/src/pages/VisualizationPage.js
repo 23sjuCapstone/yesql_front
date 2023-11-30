@@ -3,13 +3,20 @@ import { Button } from "../components/Button";
 import importIcon from "../img/import.png";
 import exportIcon from "../img/export.png";
 import axios from "axios";
-import _ from "lodash";
+import _, { isArray, result } from "lodash";
 
 const VisualizationPage = () => {
   const [sqlInput, setSqlInput] = useState("");
   const [currentTab, clickTab] = useState(0);
-
+  const [userId, setUserId] = useState(localStorage.getItem("userId"));
   const [isRunClick, setIsRunClick] = useState(false);
+  const [isErrorSQL, setIsError] = useState(false);
+  const [isErrorMessage, setIsErrorMessage] = useState("");
+
+  useEffect(() => {
+    console.log("error", isErrorSQL);
+  }, [isErrorSQL]);
+
   const [VisualSQLdata, setVisualSQLData] = useState({
     rows: [],
     columns: [],
@@ -67,11 +74,20 @@ const VisualizationPage = () => {
       })
       .then((response) => {
         const result = response.data.result;
-        console.log("visualsqlresult=", result);
+        console.log("obj", result);
+        console.log(response);
         setVisualSQLData(result);
+        if (response.data.isSuccess === false) {
+          console.log("!");
+          setIsError(true);
+          setIsErrorMessage(result);
+        } else {
+          setIsError(false);
+        }
       })
       .catch((error) => {
         console.error("Error:", error);
+        setIsError(true);
       });
 
     axios
@@ -84,6 +100,7 @@ const VisualizationPage = () => {
       })
       .catch((error) => {
         console.error("Error:", error);
+        setIsError(true);
       });
 
     axios
@@ -92,31 +109,47 @@ const VisualizationPage = () => {
       })
       .then((response) => {
         const result = response.data.result;
-        if (sqlparse !== "") {
-          setSchemasData(result);
-        }
       })
       .catch((error) => {
         console.error("Error:", error);
+
+        setIsError(true);
       });
   }
 
+  function printError() {
+    console.log(isErrorSQL);
+    if (isErrorSQL) {
+      return (
+        <div>
+          <p className="ml-4 font-bold text-red-500">{isErrorMessage}</p>
+          <span className="ml-4 ">SQL문을 다시 확인해주세요!</span>
+        </div>
+      );
+    } else {
+      return <div className="h-12"></div>;
+    }
+  }
   return (
     <div>
-      <div className="text-5xl mb-10 border-b-2 border-yesql">
+      <div className="text-5xl mb-10 border-b-2 border-yesql grid grid-cols-6">
         <p className="ml-5 mt-2.5 mb-4 text-yesql font-bold">yeSQL</p>
+        <p className="mt-10 col-start-6 text-lg font-bold text-yesql float-right">
+          {userId}님 안녕하세요
+        </p>
       </div>
 
       <div class="grid grid-cols-2 gap-x-6 mx-8 mb-4">
-        <div class="h-96 rounded-2xl shadow-md border border-grey">
+        <div class="h-84 rounded-2xl shadow-md border border-grey">
           <textarea
             type="text"
             value={sqlInput}
             onChange={(e) => {
               setSqlInput(e.target.value);
             }}
-            class="rounded-2xl h-5/6 w-full px-4 pt-4 resize-none focus:border-0"
+            class="rounded-2xl h-4/6 w-full px-4 pt-4 resize-none focus:border-0"
           />
+          {printError()}
           <button
             onClick={() => run()}
             type="button"
@@ -127,8 +160,10 @@ const VisualizationPage = () => {
           {/* <button type="button" class="flex rounded-xl bg-blue-600 px-3 py-1.5 text-xl leading-6 text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">RUN</button> */}
         </div>
 
-        <div class="h-96 rounded-2xl shadow-md border">
-          <div class="ml-4 relative overflow-x-auto shadow-md sm:rounded-lg"></div>
+        <div class="h-96 rounded-2xl shadow-md border overflow-scroll">
+          <div class="relative shadow-md sm:rounded-lg">
+            {<Result obj={Resultdata} isRunClick={isRunClick} />}
+          </div>
         </div>
       </div>
 
@@ -146,11 +181,12 @@ const VisualizationPage = () => {
               {el.name}
             </li>
           ))}
+
           <a className="col-start-11 text-center flex flex-row">
             import
             <img src={importIcon} className="w-5 h-5 mt-1 ml-1"></img>
           </a>
-          <a className="text-center flex flex-row">
+          <a href="/main" className="text-center flex flex-row">
             export
             <img src={exportIcon} className="w-5 h-5 mt-1 ml-1"></img>
           </a>
@@ -226,7 +262,7 @@ const Result = ({ obj, isRunClick }) => {
     return isRunClick ? (
       <div>
         <div className="flex flex-row">
-          <div class="relative overflow-x-auto shadow-md sm:rounded-lg mx-auto my-8 w-fit">
+          <div class="relative shadow-md sm:rounded-lg mx-auto my-20 w-fit">
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
               <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
@@ -259,6 +295,7 @@ const Result = ({ obj, isRunClick }) => {
 //tap-VisualSql
 const VisualSql = ({ obj, isRunClick }) => {
   const orderKeyword = ["SELECT", "FROM", "WHERE"];
+  const joinKeyword = ["UNION", "INNER", "JOIN"];
   let count = 0;
   if (obj && Array.isArray(obj)) {
     return isRunClick ? (
@@ -277,10 +314,14 @@ const VisualSql = ({ obj, isRunClick }) => {
                     const isKeyword = orderKeyword.includes(
                       word.replace(/>/, "")
                     );
+                    const isJoin = joinKeyword.includes(word.replace(/>/, ""));
+
                     return (
                       <span
                         key={index}
-                        className={isKeyword ? "text-yesql font-bold" : ""}
+                        className={`${
+                          isKeyword ? "text-yesql font-bold" : ""
+                        } ${isJoin ? "text-red-500 font-bold" : ""}`}
                       >
                         {word}{" "}
                       </span>
@@ -306,53 +347,22 @@ const VisualSql = ({ obj, isRunClick }) => {
                               <tr>
                                 {td.columns.map((subject, columnIndex) => {
                                   if (item.keyword === "SELECT") {
-                                    var isSelectedColumn;
                                     const columnLabel =
                                       item.selectedColumns[0].columnLabel;
                                     if (columnLabel === "*") {
-                                      isSelectedColumn = true;
-                                    } else {
-                                      if (
-                                        item.selectedColumns.tableName === null
-                                      ) {
-                                        isSelectedColumn =
-                                          item.selectedColumns.find(
-                                            (col) => col.columnLabel === subject
-                                          );
-                                        console.log(
-                                          "Xxxxxxxxxxxxxxxxxxx",
-                                          isSelectedColumn
+                                      const isSelectedColumn = true;
+                                      const isConditionColumn =
+                                        item.conditionColumns.find(
+                                          (col) => col.columnLabel === subject
                                         );
-                                      } else {
-                                        isSelectedColumn =
-                                          item.selectedColumns.find((col) => {
-                                            col.columnLabel === subject &&
-                                              item.selectedColumns.tableName ===
-                                                item.tables.alias;
-                                          });
-                                        // console.log(columnIndex);
-                                        // console.log(isSelectedColumn);
-                                        // isSelectedColumn =
-                                        //   item.selectedColumns.find(
-                                        //     (col) => col.columnLabel === subject
-                                        //   ) &&
-                                        //   item.selectedColumns.tableName ===
-                                        //     item.tables.alias;
-
-                                        console.log(
-                                          isSelectedColumn,
-                                          "00000000000000000000000000"
-                                        );
-                                        console.log(
-                                          item.selectedColumns.tableName ===
-                                            item.tables.alias
-                                        );
-                                      }
-                                    }
-                                    if (item.conditionColumns === null) {
                                       return (
+                                        //"border-4 border-red-500"
                                         <th
-                                          className={`px-6 py-3 border-x-4 border-t-4 border-yesql ${
+                                          className={`px-6 py-3 ${
+                                            isConditionColumn
+                                              ? "bg-red-200"
+                                              : ""
+                                          } ${
                                             isSelectedColumn
                                               ? "border-x-4 border-t-4 border-yesql"
                                               : ""
@@ -361,15 +371,24 @@ const VisualSql = ({ obj, isRunClick }) => {
                                           {subject}
                                         </th>
                                       );
+                                    } else if (item.conditionColumns === null) {
+                                      return (
+                                        <th className="px-6 py-3">{subject}</th>
+                                      );
                                     } else {
                                       const isConditionColumn =
                                         item.conditionColumns.find(
                                           (col) => col.columnLabel === subject
                                         );
-
+                                      const isSelectedColumn =
+                                        item.selectedColumns.find(
+                                          (col) => col.columnLabel === subject
+                                        );
                                       return (
+                                        //"border-4 border-red-500"
                                         <th
-                                          className={`px-6 py-3 border-x-4 border-t-4 border-yesql ${
+                                          key={columnIndex}
+                                          className={`px-6 py-3 ${
                                             isConditionColumn
                                               ? "bg-red-200"
                                               : ""
@@ -406,7 +425,7 @@ const VisualSql = ({ obj, isRunClick }) => {
                                     if (item.keyword === "SELECT") {
                                       const columnLabel =
                                         item.selectedColumns[0].columnLabel;
-                                      var isSelectedColumn;
+                                      let isSelectedColumn;
                                       const isLastColumn =
                                         rowIndex === td.rows.length - 1;
                                       if (columnLabel === "*") {
@@ -489,7 +508,7 @@ const VisualSql = ({ obj, isRunClick }) => {
         ))}
       </div>
     ) : (
-      <div></div>
+      <div>1</div>
     );
   } else {
     return <div></div>;
@@ -498,6 +517,7 @@ const VisualSql = ({ obj, isRunClick }) => {
 
 const TapSimpleSchemas = ({ schema, isRunClick }) => {
   if (schema) {
+    console.log(schema);
     return isRunClick ? (
       <div className="px-8 pt-8 flex flex-wrap gap-x-8 gap-y-4">
         {schema.map((obj, index) => (

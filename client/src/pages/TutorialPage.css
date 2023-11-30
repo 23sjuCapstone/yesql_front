@@ -1,0 +1,26 @@
+.tutorialBody {
+  /* background-image: url(../img/tutorial.png); */
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: cover;
+  background-attachment: fixed;
+  height: 100vh;
+  background-repeat: no-repeat;
+}
+
+.torutialImg {
+  width: 100%;
+}
+
+.startButton {
+  font-family: "GmarketSansLight";
+  position: sticky;
+  bottom: 30px;
+
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  -webkit-box-shadow: 0px 10px 13px -7px #000000,
+    5px 5px 15px 5px rgba(0, 0, 0, 0);
+  box-shadow: 0px 10px 13px -10px #434343, 5px 5px 15px 5px rgba(0, 0, 0, 0);
+}

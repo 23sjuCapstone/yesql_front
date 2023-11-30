@@ -7,6 +7,8 @@ import RegisterPage from "./pages/RegisterPage";
 import DataBasePage from "./pages/DataBasePage";
 import Main from "./pages/Main";
 import VisualizationPage from "./pages/VisualizationPage";
+import TutorialPage from "./pages/TutorialPage";
+import WelcomePage from "./pages/WelcomePage";
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
         <Route path="/main" element={<Main />} />
         <Route path="/export" element={<exportTap />} />
         <Route path="/import" element={<importTap />} />
+        <Route path="/tutorial" element={<TutorialPage />} />
+        <Route path="/welcome" element={<WelcomePage />} />
       </Routes>
     </Router>
   );
