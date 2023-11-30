@@ -20,8 +20,6 @@ function App() {
         <Route path="/visual" element={<VisualizationPage />} />
         <Route path="/main" element={<Main />} />
         <Route path="/main2" element={<Main2 />} />
-        <Route path="/export" element={<exportTap />} />
-        <Route path="/import" element={<importTap />} />
         <Route path="/tutorial" element={<TutorialPage />} />
         <Route path="/welcome" element={<WelcomePage />} />
       </Routes>
