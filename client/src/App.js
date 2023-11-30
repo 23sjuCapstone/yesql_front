@@ -16,6 +16,9 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/visual" element={<VisualizationPage />} />
+        <Route path="/main" element={<Main />} />
+        <Route path="/export" element={<exportTap />} />
+        <Route path="/import" element={<importTap />} />
       </Routes>
     </Router>
   );
