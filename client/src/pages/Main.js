@@ -28,7 +28,7 @@ const Main = () => {
     const url = "http://yesql-api.shop:8080";
     axios
       .get(url + "/manage/export", {
-        params: { dbName: "u1", tableName: tableName },
+        params: { dbName: "admin", tableName: tableName },
       })
       .then((response) => {
         console.log("Response Data:", response);

@@ -4,6 +4,7 @@ import importIcon from "../img/import.png";
 import exportIcon from "../img/export.png";
 import axios from "axios";
 import _, { isArray, result } from "lodash";
+import logo from "../img/logo.png";
 
 const VisualizationPage = () => {
   const [sqlInput, setSqlInput] = useState("");
@@ -80,7 +81,7 @@ const VisualizationPage = () => {
         if (response.data.isSuccess === false) {
           console.log("!");
           setIsError(true);
-          setIsErrorMessage(result);
+          setIsErrorMessage(response.data.message);
         } else {
           setIsError(false);
         }
@@ -133,9 +134,11 @@ const VisualizationPage = () => {
   }
   return (
     <div>
-      <div className="text-5xl mb-10 border-b-2 border-yesql grid grid-cols-6">
-        <p className="ml-5 mt-2.5 mb-4 text-yesql font-bold">yeSQL</p>
-        <p className="mt-10 col-start-6 text-lg font-bold text-yesql float-right">
+      <div className="grid grid-col-8 text-5xl mb-10 border-b-2 border-yesql">
+        <a>
+          <img src={logo} width="121.35" height="15" className="m-3" />
+        </a>
+        <p className="mt-10 col-start-8 text-lg font-bold text-yesql float-right">
           {userId}님 안녕하세요
         </p>
       </div>
