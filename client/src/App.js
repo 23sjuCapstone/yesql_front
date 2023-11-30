@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import DataBasePage from "./pages/DataBasePage";
+import Main2 from "./pages/main2";
 import Main from "./pages/Main";
 import VisualizationPage from "./pages/VisualizationPage";
 import TutorialPage from "./pages/TutorialPage";
@@ -19,6 +19,7 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/visual" element={<VisualizationPage />} />
         <Route path="/main" element={<Main />} />
+        <Route path="/main2" element={<Main2 />} />
         <Route path="/export" element={<exportTap />} />
         <Route path="/import" element={<importTap />} />
         <Route path="/tutorial" element={<TutorialPage />} />

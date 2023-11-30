@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, Navigate, useAsyncError, useNavigate } from "react-router-dom";
 
-const Main = () => {
+const Main2 = () => {
   const [Schemasdata, setSchemasData] = useState({
     table: [],
   });
@@ -131,4 +131,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default Main2;

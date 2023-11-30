@@ -71,7 +71,7 @@ const VisualizationPage = () => {
     setIsRunClick(true);
     axios
       .get(url + "/sql/runByStep", {
-        params: { sql: sqlparse, dbName: "admin" },
+        params: { sql: sqlparse, dbName: "appletantam" },
       })
       .then((response) => {
         const result = response.data.result;
@@ -93,7 +93,7 @@ const VisualizationPage = () => {
 
     axios
       .get(url + "/sql/resultData", {
-        params: { sql: sqlparse, dbName: "admin" },
+        params: { sql: sqlparse, dbName: "appletantam" },
       })
       .then((response) => {
         const result = response.data.result;
@@ -106,7 +106,7 @@ const VisualizationPage = () => {
 
     axios
       .get(url + "/manage/schemas/specificData", {
-        params: { dbName: "admin" },
+        params: { dbName: "appletantam" },
       })
       .then((response) => {
         const result = response.data.result;
@@ -186,7 +186,7 @@ const VisualizationPage = () => {
             </li>
           ))}
 
-          <a className="col-start-11 text-center flex flex-row">
+          <a href="/main2" className="col-start-11 text-center flex flex-row">
             import
             <img src={importIcon} className="w-5 h-5 mt-1 ml-1"></img>
           </a>
