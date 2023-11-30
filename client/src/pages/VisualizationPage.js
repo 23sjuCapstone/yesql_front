@@ -109,6 +109,7 @@ const VisualizationPage = () => {
       })
       .then((response) => {
         const result = response.data.result;
+        setSchemasData(result);
       })
       .catch((error) => {
         console.error("Error:", error);
