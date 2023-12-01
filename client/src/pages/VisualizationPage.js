@@ -355,16 +355,10 @@ const VisualSql = ({ obj, isRunClick }) => {
                                       item.selectedColumns[0].columnLabel;
                                     if (columnLabel === "*") {
                                       const isSelectedColumn = true;
-                                      var isConditionColumn;
-                                      if (isConditionColumn) {
-                                        isConditionColumn =
-                                          item.conditionColumns.find(
-                                            (col) => col.columnLabel === subject
-                                          );
-                                      } else {
-                                        isConditionColumn = false;
-                                      }
-
+                                      const isConditionColumn =
+                                        item.conditionColumns.find(
+                                          (col) => col.columnLabel === subject
+                                        );
                                       return (
                                         //"border-4 border-red-500"
                                         <th
