@@ -7,7 +7,7 @@ const Main2 = () => {
     table: [],
   });
   useEffect(() => {
-    const url = "http://yesql-api.shop:8080";
+    const url = "https://yesql-api.shop";
     axios
       .get(url + "/manage/schemas/specificData", {
         params: { dbName: localStorage.getItem("userId") },

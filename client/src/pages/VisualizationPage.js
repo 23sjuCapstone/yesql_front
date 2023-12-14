@@ -66,7 +66,7 @@ const VisualizationPage = () => {
 
   //resultData, runByStep, simple/specific SchemasData api 호출
   function run() {
-    const url = "http://yesql-api.shop:8080";
+    const url = "https://yesql-api.shop";
     const sqlparse = sqlInput;
     setIsRunClick(true);
     axios
@@ -211,8 +211,10 @@ const VisualizationPage = () => {
 };
 
 function RequestSQLResult({ sqlparse, userId }) {
-  const url = "http://yesql-api.shop:8080";
+  const url = "https://yesql-api.shop";
   const [tapResult, setTapResult] = useState({ columns: [], rows: [] });
+  console.log("Request", sqlparse, userId);
+
   useEffect(() => {
     axios
       .get(url + "/sql/resultData", {
@@ -225,6 +227,7 @@ function RequestSQLResult({ sqlparse, userId }) {
         const result = response.data.result;
         const deepCopiedResult = _.cloneDeep(result); // 깊은 복사
         setTapResult(deepCopiedResult);
+        console.log("result=", result);
       })
       .catch((error) => {
         console.error("Error:", error);

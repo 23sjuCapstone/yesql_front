@@ -23,7 +23,7 @@ function LandingPage() {
   };
 
   function Login() {
-    const url = "http://yesql-api.shop:8080";
+    const url = "https://yesql-api.shop";
     localStorage.removeItem("userId");
     axios
       .post(

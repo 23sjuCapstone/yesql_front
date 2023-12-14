@@ -21,7 +21,7 @@ function LandingPage() {
   }, [userId, userPassword, userPasswordCheck, isDubplicated]);
 
   function idDuplicateCheck() {
-    const url = "http://yesql-api.shop:8080";
+    const url = "https://yesql-api.shop";
     axios
       .post(url + "/auth/checkDuplicatedId", {}, { params: { userId: userId } })
       .then((response) => {
