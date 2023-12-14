@@ -59,7 +59,7 @@ function LandingPage() {
     ) {
       alert("아이디나 비밀번호를 확인해주세요.");
     } else {
-      const url = "http://yesql-api.shop:8080";
+      const url = "https://yesql-api.shop";
       axios
         .post(
           url + "/auth/register",
@@ -86,7 +86,7 @@ function LandingPage() {
   }
 
   function Login() {
-    const url = "http://yesql-api.shop:8080";
+    const url = "https://yesql-api.shop";
     localStorage.removeItem("userId");
     axios
       .post(
