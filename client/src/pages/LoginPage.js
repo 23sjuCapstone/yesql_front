@@ -9,9 +9,10 @@ function LandingPage() {
   const [isCheck, setIsCheck] = useState(false);
   const [checkMessage, setCheckMessage] = useState("");
   const navigate = useNavigate();
-  useEffect(() => {
-    console.log("userId=", userId, userPassword);
-  }, [userId, userPassword]);
+  // 출력
+  // useEffect(() => {
+  //   console.log("userId=", userId, userPassword);
+  // }, [userId, userPassword]);
 
   const [isValid, setIsValid] = useState(true);
   const [enteredValue, setEnteredValue] = useState("");
@@ -48,10 +49,6 @@ function LandingPage() {
         console.error("Error:", error);
       });
   }
-
-  const goToDatabase = () => {
-    navigate("/database");
-  };
 
   const goToMain = () => {
     navigate("/visual");

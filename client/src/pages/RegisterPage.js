@@ -67,7 +67,6 @@ function LandingPage() {
           { params: { userId: userId, userPassword: userPassword } }
         )
         .then((response) => {
-          console.log("Response Data:", response);
           Login();
         })
         .catch((error) => {
@@ -96,8 +95,6 @@ function LandingPage() {
         { params: { userId: userId, userPassword: userPassword } }
       )
       .then((response) => {
-        console.log("Response Data:", response.data);
-        console.log(userId, userPassword);
         if (response.data.isSuccess) {
           localStorage.setItem("userId", userId);
           goToWelcome();

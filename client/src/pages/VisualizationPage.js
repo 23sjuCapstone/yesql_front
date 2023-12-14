@@ -14,9 +14,9 @@ const VisualizationPage = () => {
   const [isErrorSQL, setIsError] = useState(false);
   const [isErrorMessage, setIsErrorMessage] = useState("");
 
-  useEffect(() => {
-    console.log("error", isErrorSQL);
-  }, [isErrorSQL]);
+  // useEffect(() => {
+  //   console.log("error", isErrorSQL);
+  // }, [isErrorSQL]);
 
   const [VisualSQLdata, setVisualSQLData] = useState({
     rows: [],
@@ -75,11 +75,8 @@ const VisualizationPage = () => {
       })
       .then((response) => {
         const result = response.data.result;
-        console.log("obj", result);
-        console.log(response);
         setVisualSQLData(result);
         if (response.data.isSuccess === false) {
-          console.log("!");
           setIsError(true);
           setIsErrorMessage(response.data.message);
         } else {
@@ -114,13 +111,11 @@ const VisualizationPage = () => {
       })
       .catch((error) => {
         console.error("Error:", error);
-
         setIsError(true);
       });
   }
 
   function printError() {
-    console.log(isErrorSQL);
     if (isErrorSQL) {
       return (
         <div>
@@ -213,7 +208,6 @@ const VisualizationPage = () => {
 function RequestSQLResult({ sqlparse, userId }) {
   const url = "https://yesql-api.shop";
   const [tapResult, setTapResult] = useState({ columns: [], rows: [] });
-  console.log("Request", sqlparse, userId);
 
   useEffect(() => {
     axios
@@ -227,7 +221,6 @@ function RequestSQLResult({ sqlparse, userId }) {
         const result = response.data.result;
         const deepCopiedResult = _.cloneDeep(result); // 깊은 복사
         setTapResult(deepCopiedResult);
-        console.log("result=", result);
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -532,7 +525,6 @@ const VisualSql = ({ obj, isRunClick }) => {
 
 const TapSimpleSchemas = ({ schema, isRunClick }) => {
   if (schema) {
-    console.log(schema);
     return isRunClick ? (
       <div className="px-8 pt-8 flex flex-wrap gap-x-8 gap-y-4">
         {schema.map((obj, index) => (

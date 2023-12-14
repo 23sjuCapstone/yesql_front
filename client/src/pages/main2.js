@@ -14,7 +14,6 @@ const Main2 = () => {
       })
       .then((response) => {
         const result = response.data.result;
-        console.log(result);
         setSchemasData(result);
       })
       .catch((error) => {
@@ -24,16 +23,13 @@ const Main2 = () => {
 
   const [data, setData] = useState([]);
   const exportdb = ({ tableName }) => {
-    console.log(tableName);
     const url = "http://yesql-api.shop:8080";
     axios
       .get(url + "/manage/export", {
         params: { dbName: "appletantam", tableName: tableName },
       })
       .then((response) => {
-        console.log("Response Data:", response);
         setData(response.data.JSON);
-        console.log(data);
         onDownloadBtn({ table: tableName }); // 데이터 다운로드 함수 호출
       })
       .catch((error) => {

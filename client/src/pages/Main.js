@@ -14,7 +14,6 @@ const Main = () => {
       })
       .then((response) => {
         const result = response.data.result;
-        console.log(result);
         setSchemasData(result);
       })
       .catch((error) => {
@@ -31,9 +30,7 @@ const Main = () => {
         params: { dbName: "appletantam", tableName: tableName },
       })
       .then((response) => {
-        console.log("Response Data:", response);
         setData(response.data.JSON);
-        console.log(data);
         onDownloadBtn({ table: tableName }); // 데이터 다운로드 함수 호출
       })
       .catch((error) => {
